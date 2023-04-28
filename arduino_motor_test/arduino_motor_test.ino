@@ -21,58 +21,73 @@ void setup() {
 }
 
 byte x = 150;
-byte timeCount =11;
+byte timeCount = 11;
+int dir = 1;
 
-byte addr = 0x29;
+ byte addr = 0x29;
 
 void loop() {
   /*Wire.requestFrom(0x29, 5);    // request 6 bytes from slave device #8
-  Serial.print("values: ");
-  while (Wire.available()) { // slave may send less than requested
+    Serial.print("values: ");
+    while (Wire.available()) { // slave may send less than requested
     char c = Wire.read(); // receive a byte as character
     Serial.print(c,HEX);         // print the character
     Serial.print(" ");
-  }
-  Serial.print("\n");*/
-  Wire.beginTransmission(addr); // transmit to device #8
-  //Wire.write(byte(0xEE));       // sends five bytes
-  Wire.write(x);              // sends one byte
-  Wire.endTransmission();    // stop transmitting
-  x++;
-  timeCount+=1;
-  if(timeCount>=10){
-    timeCount = 0;
-    
-    Serial.write("set speed to: ");
-    Serial.print(x&0xFF,DEC);
-    Serial.print("\n");
-    Wire.requestFrom(addr, 5);    // request 6 bytes from slave device #8
-    Serial.print("values: ");
-    int curVal = 0;
-    while (Wire.available()) { // slave may send less than requested
-      char c = Wire.read(); // receive a byte as character
-      if (curVal == 0){
-        Serial.print("current:");
-      }
-      if (curVal == 1){
-        Serial.print("state:");
-      }
-      if (curVal == 2){
-        Serial.print("temp:");
-      }
-      if (curVal == 3){
-        Serial.print("rpm:");
-      }
-      if (curVal == 4){
-        Serial.print("voltage:");
-      }
-      Serial.print(c&0xFF,DEC);         // print the character
-      Serial.print(" ");
-      curVal++;
     }
-    Serial.print("\n");
+    Serial.print("\n");*/
+  if (addr != 0x2A) {
+    Wire.beginTransmission(addr); // transmit to device #8
+    //Wire.write(byte(0xEE));       // sends five bytes
+    Wire.write(x);              // sends one byte
+    Wire.endTransmission();    // stop transmitting
+    x += dir;
+    timeCount += 1;
+    if (timeCount >= 10) {
+      timeCount = 0;
+
+
+      Serial.write("set speed to: ");
+      Serial.print(x & 0xFF, DEC);
+      Serial.print("\n");
+      Wire.requestFrom(addr, 5);    // request 6 bytes from slave device #8
+      Serial.print("values: ");
+      int curVal = 0;
+
+      while (Wire.available()) { // slave may send less than requested
+        char c = Wire.read(); // receive a byte as character
+        if (curVal == 0) {
+          Serial.print("current:");
+        }
+        if (curVal == 1) {
+          Serial.print("state:");
+        }
+        if (curVal == 2) {
+          Serial.print("temp:");
+        }
+        if (curVal == 3) {
+          Serial.print("rpm:");
+        }
+        if (curVal == 4) {
+          Serial.print("voltage:");
+        }
+        Serial.print(c & 0xFF, DEC);      // print the character
+        Serial.print(" ");
+        curVal++;
+      }
+      Serial.print("\n");
+    }
+  }
+  addr++;
+  if (addr > 0x30) {
+    addr = 0x29;
+  }
+  if (x > 254) {
+    dir = -1;
+  }
+  else if (x < 1) {
+    dir = 1;
   }
 
-  
-  delay(100);
+
+  //delay(5);
 }
